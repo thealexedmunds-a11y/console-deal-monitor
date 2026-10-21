@@ -1,30 +1,33 @@
-// --- EASY SETTINGS - CHANGE THESE ANYTIME ---
+// --- EASY SETTINGS - CHANGE ANYTIME ---
 const MAX_PRICE = 250;
 const CONSOLES = ["PS5", "Xbox Series X"];
-const CHECK_EVERY_MINUTES = 5;
-
 const BOT_TOKEN = "8778654341:AAFmGJfpUkP0zfLPB3I9DNEv2RH3KmVamlA";
 const CHAT_ID = "8900619623";
-// -------------------------------------------
+// --------------------------------------
 
 async function sendTelegram(msg) {
   try {
-    await fetch(https://api.telegram.org/bot${BOT_TOKEN}/sendMessage, {
+    const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ chat_id: CHAT_ID, text: msg, parse_mode: "Markdown" })
+      body: JSON.stringify({ chat_id: CHAT_ID, text: msg })
     });
-    console.log("Sent:", msg);
-  } catch(e){ console.log(e); }
+    const data = await res.json();
+    console.log("Telegram result:", data);
+  } catch(e){ console.log("Error:", e); }
 }
 
-// Test ping on startup - you will get this once
-sendTelegram(✅ Monitor LIVE! Checking for ${CONSOLES.join(", ")} under £${MAX_PRICE} every ${CHECK_EVERY_MINUTES}min);
+// Send test message on start
+sendTelegram(`✅ Monitor LIVE! Checking for ${CONSOLES.join(", ")} under £${MAX_PRICE}`);
 
-// Your scanning logic goes here
-// Example: if(price < MAX_PRICE) await sendTelegram(🎮 DEAL! ${name} for £${price} - ${link});
+// Simple web server (Render needs this to stay alive)
+const http = require('http');
+const server = http.createServer((req, res) => {
+  res.writeHead(200, { 'Content-Type': 'text/plain' });
+  res.end('Console monitor running - Telegram active');
+});
 
-const express = require('express');
-const app = express();
-app.get('/', (req,res) => res.send('Console monitor running'));
-app.listen(10000, () => console.log('Server running'));
+const PORT = process.env.PORT || 10000;
+server.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
